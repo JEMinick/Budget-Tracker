@@ -29,6 +29,8 @@ Modules and packages required to be installed (provided you have the package.jso
 ```shell
 npm i
 ```
+## On-Line App:
+[Live app on Heroku.com](https://eds-budget-tracker.herokuapp.com/)
 
 ## Usage
 <a name="usage"></a>
