@@ -37,6 +37,9 @@ To run this application:
 ```
 node server.js
 ```
+## Sample screen shot:
+
+![Budget-Tracker screen shot:](./assets/budgettracker.png?raw=true)
 
 ## Contributing
 <a name="contributing"></a>
