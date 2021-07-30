@@ -31,4 +31,14 @@ router.get("/api/transaction", (req, res) => {
     });
 });
 
+router.delete("/api/clearall", (req, res) => {
+  Transaction.remove({}, (error, response) => {
+    if (error) {
+      res.send(error);
+    } else {
+      res.send(response);
+    }
+  });
+});
+
 module.exports = router;

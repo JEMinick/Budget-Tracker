@@ -122,36 +122,78 @@ function sendTransaction(isAdding) {
       "Content-Type": "application/json"
     }
   })
-    .then(response => {
-      let data = response.json();
-      if ( data.errors ) {
-        errorEl.textContent = "Missing Information";
-      } else {
-        console.log( `SUCCESSFUL POST:` );
-        console.log( data );
-        // clear form
-        nameEl.value = "";
-        amountEl.value = "";
-      }
-    })
-    .catch(err => {
-      // fetch failed, so save in indexedDB
-      console.log( `CACHING POST:` );
-      console.log( transaction );
-
-      if ( !bCachingTransactions ) {
-        // Let's update the display to remove data that is
-        // only available while online...
-      }
-
-      saveRecord(transaction);
-
+  .then(response => {
+    let data = response.json();
+    if ( data.errors ) {
+      errorEl.textContent = "Missing Information";
+    } else {
+      console.log( `SUCCESSFUL POST:` );
+      console.log( data );
       // clear form
       nameEl.value = "";
       amountEl.value = "";
-    });
+    }
+  })
+  .catch(err => {
+    // fetch failed, so save in indexedDB
+    console.log( `CACHING POST:` );
+    console.log( transaction );
+
+    if ( !bCachingTransactions ) {
+      // Let's update the display to remove data that is
+      // only available while online...
+    }
+
+    saveRecord(transaction);
+
+    // clear form
+    nameEl.value = "";
+    amountEl.value = "";
+  });
 }
 
+function purgeBudget() {
+  const nameEl = document.querySelector("#t-name");
+  const amountEl = document.querySelector("#t-amount");
+  let errorEl = document.querySelector("#post-error");
+
+  fetch("/api/clearall", {
+    method: "DELETE",
+    headers: {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json"
+    }
+  })
+  .then(response => {
+    let data = response.json();
+    if ( data.errors ) {
+      errorEl.textContent = "Unable to purge the budget!";
+    } else {
+      console.log( `SUCCESSFUL PURGE!` );
+      console.log( data );
+      // clear form
+      nameEl.value = "";
+      amountEl.value = "";
+      errorEl.value = "";
+
+      // re-run logic to populate ui with no budget info:
+      transactions = [];
+      populateChart();
+      populateTable();
+      populateTotal();
+    }
+  })
+  .catch(err => {
+    // fetch failed, so save in indexedDB
+    console.log( `PURGE FAILED:` );
+    console.log( err.textContent );
+
+    // clear form
+    nameEl.value = "";
+    amountEl.value = "";
+    errorEl.textContent = "PURGE FAILED..."
+  });
+}
 
 document.querySelector("#add-btn").onclick = function() {
   sendTransaction(true);
@@ -159,4 +201,8 @@ document.querySelector("#add-btn").onclick = function() {
 
 document.querySelector("#sub-btn").onclick = function() {
   sendTransaction(false);
+};
+
+document.querySelector("#purge-btn").onclick = function() {
+  purgeBudget();
 };
