@@ -1,5 +1,6 @@
 let transactions = [];
 let myChart;
+let bCachingTransactions = false;
 
 fetch("/api/transaction")
   .then(response => {
@@ -121,9 +122,9 @@ function sendTransaction(isAdding) {
       "Content-Type": "application/json"
     }
   })
-    .then(response => response.json())
-    .then(data => {
-      if (data.errors) {
+    .then(response => {
+      let data = response.json();
+      if ( data.errors ) {
         errorEl.textContent = "Missing Information";
       } else {
         console.log( `SUCCESSFUL POST:` );
@@ -134,9 +135,15 @@ function sendTransaction(isAdding) {
       }
     })
     .catch(err => {
+      // fetch failed, so save in indexedDB
       console.log( `CACHING POST:` );
       console.log( transaction );
-      // fetch failed, so save in indexed db
+
+      if ( !bCachingTransactions ) {
+        // Let's update the display to remove data that is
+        // only available while online...
+      }
+
       saveRecord(transaction);
 
       // clear form
@@ -145,76 +152,6 @@ function sendTransaction(isAdding) {
     });
 }
 
-// function sendTransaction(isAdding) {
-//   let nameEl = document.querySelector("#t-name");
-//   let amountEl = document.querySelector("#t-amount");
-//   let errorEl = document.querySelector("#post-error");
-
-//   // validate form
-//   if (nameEl.value === "" || amountEl.value === "") {
-//     errorEl.textContent = "Missing Information";
-//     return;
-//   }
-//   else {
-//     if ( errorEl )
-//       errorEl.textContent = "";
-//   }
-
-//   // create record
-//   let transaction = {
-//     name: nameEl.value,
-//     value: amountEl.value,
-//     date: new Date().toISOString()
-//   };
-
-//   // if subtracting funds, convert amount to negative number
-//   if (!isAdding) {
-//     transaction.value *= -1;
-//   }
-
-//   // add to beginning of current array of data
-//   transactions.unshift(transaction);
-
-//   // re-run logic to populate ui with new record
-//   populateChart();
-//   populateTable();
-//   populateTotal();
-  
-//   // also send to server
-//   fetch("/api/transaction", {
-//     method: "POST",
-//     body: JSON.stringify(transaction),
-//     headers: {
-//       Accept: "application/json, text/plain, */*",
-//       "Content-Type": "application/json"
-//     }
-//   })
-//   .then(response => {
-//     console.log( `SUCCESSFUL POST:` );
-//     console.log( response.json() );
-//     return response.json();
-//   })
-//   .then(data => {
-//     if (data.errors) {
-//       errorEl.textContent = "Missing Information";
-//     }
-//     else {
-//       // clear form
-//       nameEl.value = "";
-//       amountEl.value = "";
-//     }
-//   })
-//   .catch(err => {
-//     console.log( `UN-SUCCESSFUL POST:` );
-//     console.log( transaction );
-//     // fetch failed, so save in indexed db
-//     saveRecord(transaction);
-
-//     // clear form
-//     nameEl.value = "";
-//     amountEl.value = "";
-//   });
-// }
 
 document.querySelector("#add-btn").onclick = function() {
   sendTransaction(true);
